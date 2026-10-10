@@ -1,0 +1,37 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.kharchakhata.app'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId 'com.kharchakhata.app'
+        minSdk 24
+        targetSdk 34
+        versionCode 1
+        versionName '1.0'
+    }
+
+    // One fixed signing key, so every new build can be installed over the old one without losing data.
+    signingConfigs {
+        debug {
+            storeFile file('kk-debug.keystore')
+            storePassword 'android'
+            keyAlias 'kkdebug'
+            keyPassword 'android'
+        }
+    }
+
+    buildTypes {
+        debug {
+            signingConfig signingConfigs.debug
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}

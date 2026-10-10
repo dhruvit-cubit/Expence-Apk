@@ -1,0 +1,933 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Kharcha Khata</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Hanken+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: phone-first single column ledger. Sticky header, scrolling view, fixed 5-slot tab bar with a raised Add button. */
+:root{
+  --bg:#F0F3F1; --surface:#FFFFFF; --soft:#E5EBE8; --ink:#14211D; --muted:#566660; --line:#D6DFDA;
+  --accent:#243F8F; --accent-ink:#FFFFFF;
+  --good:#0F7A53; --good-bg:#DAF2E7; --warn:#8F4400; --warn-bg:#FDEFD0; --bad:#B3261E; --bad-bg:#FCE4E1;
+  --c-home:#2D6CDF; --c-loan:#C2410C; --c-personal:#8B3FD9; --c-other:#64748B; --c-office:#0F8F6A; --c-sub:#BE185D;
+  --font-display:'Bricolage Grotesque',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --font-body:'Hanken Grotesk',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --font-num:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0E1513; --surface:#16201D; --soft:#222E2A; --ink:#E8F0ED; --muted:#9DADA6; --line:#2A3834;
+    --accent:#9DB4FF; --accent-ink:#0E1513;
+    --good:#5ED6A3; --good-bg:#12342A; --warn:#F6BE5A; --warn-bg:#3A2B0E; --bad:#FF8F86; --bad-bg:#3C1B18;
+    --c-home:#6FA2FF; --c-loan:#FF9A62; --c-personal:#C39BFF; --c-other:#9FB0C3; --c-office:#4FD6A8; --c-sub:#FF8FC4;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0E1513; --surface:#16201D; --soft:#222E2A; --ink:#E8F0ED; --muted:#9DADA6; --line:#2A3834;
+  --accent:#9DB4FF; --accent-ink:#0E1513;
+  --good:#5ED6A3; --good-bg:#12342A; --warn:#F6BE5A; --warn-bg:#3A2B0E; --bad:#FF8F86; --bad-bg:#3C1B18;
+  --c-home:#6FA2FF; --c-loan:#FF9A62; --c-personal:#C39BFF; --c-other:#9FB0C3; --c-office:#4FD6A8; --c-sub:#FF8FC4;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15px/1.45 var(--font-body);-webkit-text-size-adjust:100%}
+h1,h2,h3,p{margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+button:disabled{opacity:.45;cursor:not-allowed}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.num{font-family:var(--font-num);font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.small{font-size:.82rem}
+.wrap{max-width:640px;margin:0 auto;padding-inline:16px}
+svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:8px;min-height:60px}
+.brand{font:700 1.25rem/1.1 var(--font-display);letter-spacing:-.01em}
+.save{font-size:.72rem;color:var(--muted)}
+.save.bad{color:var(--bad);font-weight:700}
+.icon-btn{width:40px;height:40px;display:grid;place-items:center;border:1px solid var(--line);background:var(--surface);border-radius:8px}
+
+main.wrap{padding-block:16px 120px;display:grid;gap:16px;align-content:start}
+.page{font:700 1.5rem/1.15 var(--font-display);letter-spacing:-.015em}
+.pagehead{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;display:grid;gap:12px;min-width:0}
+.sec{font:700 .74rem var(--font-body);text-transform:uppercase;letter-spacing:.09em;color:var(--muted);display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.ttl{font:700 1.05rem/1.2 var(--font-display)}
+.grow{flex:1;min-width:0;display:grid;gap:2px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.row.end{justify-content:flex-end}
+.between{justify-content:space-between;flex-wrap:nowrap}
+.note{padding:10px 12px;border-radius:8px;background:var(--soft);font-size:.88rem}
+.note.bad{background:var(--bad-bg);color:var(--bad)}
+
+.btn{min-height:44px;padding:0 16px;border-radius:8px;border:1px solid var(--line);background:var(--surface);font-weight:600}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.small{min-height:36px;padding:0 12px;font-size:.88rem}
+.btn.ghost{background:transparent}
+.btn.danger{color:var(--bad);border-color:var(--bad)}
+.link{background:none;border:0;padding:0;color:var(--accent);text-decoration:underline;font-weight:600}
+
+label{display:grid;gap:6px;font-weight:600;font-size:.88rem;min-width:0}
+input,select,textarea{width:100%;min-height:44px;padding:8px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink)}
+textarea{min-height:130px;font-family:var(--font-num);font-size:.8rem}
+input[type=checkbox]{width:20px;min-height:20px;height:20px;flex:none;margin-top:2px}
+.check{display:flex;gap:10px;align-items:flex-start;font-weight:500}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:380px){.two{grid-template-columns:1fr}}
+.form{gap:14px}
+.lbl{font-weight:600;font-size:.88rem}
+.err{color:var(--bad);font-weight:600;font-size:.88rem}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{min-height:40px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font-weight:600;display:inline-flex;align-items:center;gap:8px}
+.chip.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.chip.drag{cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
+.chip .cx{background:none;border:0;padding:0 2px;color:inherit;font-size:1.1rem;line-height:1}
+.ghost-chip{position:fixed;z-index:100;pointer-events:none;transform:translate(-50%,-50%);box-shadow:0 6px 18px rgba(0,0,0,.25)}
+body.dragging{user-select:none;-webkit-user-select:none}
+.loanbox{display:grid;gap:12px;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--bg)}
+.drop{min-height:56px;border:2px dashed var(--line);border-radius:10px;display:flex;align-items:center;justify-content:center;color:var(--muted);padding:8px;text-align:center}
+.drop.over{border-color:var(--accent);background:var(--soft)}
+.drop.filled{border-style:solid;border-color:var(--accent);color:var(--ink)}
+
+.pill{display:inline-flex;align-items:center;min-height:22px;padding:0 9px;border-radius:999px;font-size:.74rem;font-weight:700;white-space:nowrap}
+.pill.over{background:var(--bad-bg);color:var(--bad)}
+.pill.soon{background:var(--warn-bg);color:var(--warn)}
+.pill.ok{background:var(--soft);color:var(--muted)}
+.pill.good{background:var(--good-bg);color:var(--good)}
+
+.mnav{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.mnav b{font:700 1.15rem var(--font-display)}
+.hero{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px 16px;display:grid;gap:6px}
+.hero .big{font:700 clamp(2.1rem,10vw,3rem)/1.05 var(--font-display);letter-spacing:-.02em;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+
+.arow{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:8px}
+.arow.over{background:var(--bad-bg)}
+.arow.soon{background:var(--warn-bg)}
+.arow.over strong{color:var(--bad)}
+.arow.soon strong{color:var(--warn)}
+
+.list{display:grid}
+.lrow{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line);min-width:0}
+.lrow:first-child{border-top:0}
+.dot{width:10px;height:10px;border-radius:50%;flex:none}
+.amt{font-weight:600;white-space:nowrap}
+.x{width:36px;height:36px;display:grid;place-items:center;border:0;background:none;color:var(--muted);border-radius:8px;flex:none}
+.dayhead{display:flex;justify-content:space-between;font:700 .74rem var(--font-body);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);padding-top:4px}
+
+.brow{display:grid;gap:6px;width:100%;text-align:left;background:none;border:0;padding:8px 0}
+.bhead{display:flex;align-items:center;gap:8px}
+.track{height:8px;background:var(--soft);border-radius:4px;overflow:hidden}
+.track i{display:block;height:100%;border-radius:4px}
+.daily{display:flex;align-items:flex-end;gap:2px;height:96px;border-bottom:1px solid var(--line)}
+.dcol{flex:1;min-width:0;height:100%;display:flex;align-items:flex-end}
+.dcol i{display:block;width:100%;background:var(--accent);opacity:.5;border-radius:2px 2px 0 0}
+.dcol i.today{opacity:1}
+.dcol i.zero{background:var(--line);opacity:1}
+.dlab{display:flex;justify-content:space-between;font-size:.74rem;color:var(--muted)}
+.prog{height:8px;background:var(--soft);border-radius:4px;overflow:hidden}
+.prog i{display:block;height:100%;background:var(--good);border-radius:4px}
+.mchart{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;height:150px}
+.mcol{display:grid;grid-template-rows:auto 1fr auto;gap:4px;border:0;background:none;padding:0;min-width:0;text-align:center}
+.mval{font-size:.7rem;color:var(--muted)}
+.mname{font-size:.74rem;color:var(--muted);font-weight:600}
+.mbar{display:flex;align-items:flex-end;border-bottom:1px solid var(--line)}
+.mbar i{display:block;width:100%;background:var(--accent);opacity:.45;border-radius:3px 3px 0 0}
+.mcol.sel .mbar i{opacity:1}
+.mcol.sel .mname,.mcol.sel .mval{color:var(--ink);font-weight:700}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{display:grid;gap:2px;min-width:0}
+.stat .num{font-weight:600;font-size:.95rem;overflow-wrap:anywhere}
+.big-s{font-weight:600;font-size:1.05rem;white-space:nowrap}
+
+.tabs{position:fixed;inset-inline:0;bottom:0;z-index:30;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+.tabs .wrap{display:grid;grid-template-columns:repeat(5,1fr);align-items:end;gap:4px;padding-block:6px}
+.tab{display:grid;justify-items:center;gap:2px;min-height:48px;padding:4px 0;border:0;background:none;color:var(--muted);font-size:.7rem;font-weight:600}
+.tab[aria-current]{color:var(--accent)}
+.tab.add{color:var(--ink)}
+.tab .plus{width:44px;height:44px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center}
+
+.lock{position:fixed;inset:0;z-index:50;background:var(--bg);display:grid;place-items:center;padding:24px 16px;overflow:auto}
+.lockbox{width:100%;max-width:320px;display:grid;gap:16px;justify-items:center;text-align:center}
+.dots{display:flex;gap:14px;min-height:16px}
+.dots span{width:14px;height:14px;border-radius:50%;border:2px solid var(--ink)}
+.dots span.on{background:var(--ink)}
+.keys{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;width:100%}
+.keys button{min-height:60px;border-radius:12px;border:1px solid var(--line);background:var(--surface);font:600 1.4rem var(--font-num)}
+.keys .blank{visibility:hidden}
+.shake{animation:shake .3s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+.sheet-wrap{position:fixed;inset:0;z-index:60;background:rgba(10,18,15,.55);display:flex;align-items:flex-end;justify-content:center}
+.sheet{width:100%;max-width:560px;max-height:92%;overflow:auto;background:var(--surface);border-radius:16px 16px 0 0;padding:20px 16px calc(20px + env(safe-area-inset-bottom,0px))}
+@media (min-width:640px){.sheet-wrap{align-items:center}.sheet{border-radius:16px}}
+#sheetBody{display:grid;gap:14px;margin-top:14px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(88px + env(safe-area-inset-bottom,0px));z-index:70;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:8px;font-weight:600;max-width:calc(100% - 32px);text-align:center}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div id="lock" class="lock"></div>
+
+<div id="app" hidden>
+  <header class="top">
+    <div class="wrap">
+      <div class="grow">
+        <div class="brand">Kharcha Khata</div>
+        <div id="saveState" class="save">Auto-save on</div>
+      </div>
+      <button class="icon-btn" data-act="tab" data-tab="settings" aria-label="Settings"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg></button>
+      <button class="icon-btn" data-act="lock" aria-label="Lock app"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg></button>
+    </div>
+  </header>
+  <main id="view" class="wrap"></main>
+  <nav id="tabs" class="tabs" aria-label="Main"></nav>
+</div>
+
+<div id="sheetWrap" class="sheet-wrap" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+    <h2 id="sheetTitle" class="page"></h2>
+    <form id="sheetForm" novalidate><div id="sheetBody"></div></form>
+  </div>
+</div>
+<div id="toast" class="toast" role="status" hidden></div>
+
+<script>
+(function(){
+'use strict';
+const KEY_DATA='kk.data.v1', KEY_AUTH='kk.auth.v1';
+const CATS=['Home','Loan','Personal','Other','Office','Subscription'];
+const CVAR={Home:'--c-home',Loan:'--c-loan',Personal:'--c-personal',Other:'--c-other',Office:'--c-office',Subscription:'--c-sub'};
+const LOAN_TYPES=['Home Loan','Car Loan','Personal Loan','Other Loan'];
+const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=()=>Math.random().toString(36).slice(2,9)+Date.now().toString(36);
+const round2=n=>Math.round(n*100)/100;
+const inr=n=>'₹'+(Math.round(n*100)/100).toLocaleString('en-IN',{maximumFractionDigits:2});
+
+/* ---------- storage ---------- */
+let storageOk=true;
+try{localStorage.setItem('kk.t','1');localStorage.removeItem('kk.t')}catch(e){storageOk=false}
+const lsGet=k=>{try{return localStorage.getItem(k)}catch(e){return null}};
+const lsSet=(k,v)=>{try{localStorage.setItem(k,v);return true}catch(e){storageOk=false;return false}};
+const lsDel=k=>{try{localStorage.removeItem(k)}catch(e){}};
+const blank=()=>({expenses:[],emis:[],people:[],lent:[],settings:{alertDays:5}});
+function load(){
+  try{
+    const r=lsGet(KEY_DATA);
+    if(r){const o=JSON.parse(r);const b=blank();return {expenses:o.expenses||b.expenses,emis:o.emis||b.emis,people:o.people||b.people,lent:o.lent||b.lent,settings:Object.assign(b.settings,o.settings||{})}}
+  }catch(e){}
+  return blank();
+}
+let DB=load();
+function save(){
+  const ok=lsSet(KEY_DATA,JSON.stringify(DB));
+  scheduleAlertsSoon();
+  const s=$('#saveState');
+  if(!s)return;
+  if(ok){s.textContent='Saved '+new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});s.className='save'}
+  else{s.textContent='Not saving';s.className='save bad'}
+}
+
+/* ---------- dates ---------- */
+const pad=n=>String(n).padStart(2,'0');
+const ymd=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const parseD=s=>{const p=s.split('-').map(Number);return new Date(p[0],p[1]-1,p[2])};
+const today=()=>ymd(new Date());
+const shiftDays=(s,n)=>{const d=parseD(s);d.setDate(d.getDate()+n);return ymd(d)};
+const daysBetween=(a,b)=>Math.round((parseD(b)-parseD(a))/86400000);
+const dim=(y,m)=>new Date(y,m,0).getDate();
+function addMonths(s,n,day){
+  const d=parseD(s);let y=d.getFullYear(),m=d.getMonth()+n;
+  y+=Math.floor(m/12);m=((m%12)+12)%12;
+  const dd=Math.min(day||d.getDate(),dim(y,m+1));
+  return y+'-'+pad(m+1)+'-'+pad(dd);
+}
+const monthLabel=k=>{const p=k.split('-').map(Number);return MONTHS[p[1]-1]+' '+p[0]};
+const shiftMonth=(k,n)=>{const p=k.split('-').map(Number);const d=new Date(p[0],p[1]-1+n,1);return d.getFullYear()+'-'+pad(d.getMonth()+1)};
+const fmtDate=s=>{const d=parseD(s);return d.getDate()+' '+MONTHS[d.getMonth()].slice(0,3)};
+const fmtDateY=s=>fmtDate(s)+' '+parseD(s).getFullYear();
+
+function compact(n){
+  if(n>=100000)return (n/100000).toFixed(1).replace(/\.0$/,'')+'L';
+  if(n>=1000)return (n/1000).toFixed(1).replace(/\.0$/,'')+'k';
+  return String(Math.round(n));
+}
+
+/* ---------- icons ---------- */
+const I={
+  dash:'<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>',
+  list:'<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>',
+  plus:'<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>',
+  cal:'<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>',
+  people:'<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 5.5a3 3 0 010 5.8M18 14.5c1.9.8 3 2.6 3 5.5"/></svg>',
+  trash:'<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>',
+  lock:'<svg class="i" viewBox="0 0 24 24" aria-hidden="true" style="width:36px;height:36px"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg>'
+};
+
+/* ---------- state ---------- */
+const UI={tab:'dash',ud:'borrow',month:today().slice(0,7),cat:'All',arm:null,open:{},draft:{amt:'',cat:'Home',note:'',date:today(),lt:'',lender:'',repay:true}};
+
+/* ---------- calculations ---------- */
+const sum=a=>a.reduce((s,e)=>s+e.amount,0);
+const monthExpenses=k=>DB.expenses.filter(e=>e.date.slice(0,7)===k);
+const emiDone=e=>!!(e.total&&e.paid>=e.total);
+function emiInfo(e){
+  if(emiDone(e))return {done:true};
+  const days=daysBetween(today(),e.due);
+  let st='ok';
+  if(days<0)st='over';else if(days<=DB.settings.alertDays)st='soon';
+  return {due:e.due,days:days,st:st};
+}
+function whenText(i){
+  if(i.days<0)return 'Overdue by '+(-i.days)+(i.days===-1?' day':' days')+' ('+fmtDate(i.due)+')';
+  if(i.days===0)return 'Due today';
+  if(i.days===1)return 'Due tomorrow ('+fmtDate(i.due)+')';
+  return 'Due in '+i.days+' days ('+fmtDate(i.due)+')';
+}
+function pillFor(i){
+  if(i.done)return '<span class="pill good">Completed</span>';
+  if(i.st==='over')return '<span class="pill over">Overdue '+(-i.days)+'d</span>';
+  if(i.days===0)return '<span class="pill soon">Due today</span>';
+  if(i.st==='soon')return '<span class="pill soon">Due in '+i.days+'d</span>';
+  return '<span class="pill ok">In '+i.days+' days</span>';
+}
+function personStats(p){let b=0,r=0;p.entries.forEach(x=>{if(x.type==='borrow'||x.type==='lend')b+=x.amount;else r+=x.amount});return {b:b,r:r,rem:round2(b-r)}}
+const findPerson=n=>{const t=String(n||'').trim().toLowerCase();return t?DB.people.find(p=>p.name.trim().toLowerCase()===t):null};
+function knownLenders(){
+  const s=new Set();
+  DB.people.forEach(p=>s.add(p.name));
+  DB.emis.forEach(e=>{if(e.lender)s.add(e.lender)});
+  DB.expenses.forEach(e=>{if(e.lender)s.add(e.lender)});
+  return Array.from(s).sort((a,b)=>a.localeCompare(b));
+}
+const hasEx=()=>DB.expenses.some(x=>x.ex)||DB.emis.some(x=>x.ex)||DB.people.some(x=>x.ex)||DB.lent.some(x=>x.ex);
+
+/* ---------- views ---------- */
+function monthNav(){
+  return '<div class="mnav"><button class="icon-btn" data-act="mprev" aria-label="Previous month"><svg class="i" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button><b>'+monthLabel(UI.month)+'</b><button class="icon-btn" data-act="mnext" aria-label="Next month"><svg class="i" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button></div>';
+}
+function vDash(){
+  const k=UI.month,list=monthExpenses(k),tot=sum(list);
+  const prevK=shiftMonth(k,-1),prev=sum(monthExpenses(prevK));
+  const empty=!DB.expenses.length&&!DB.emis.length&&!DB.people.length&&!DB.lent.length;
+  let h=monthNav();
+  if(!storageOk)h+='<div class="note bad">This browser is not allowing storage, so data will not be saved after you close the app.</div>';
+  if(hasEx())h+='<div class="note">You are looking at example data. <button class="link" data-act="rmEx">Remove examples</button></div>';
+  if(auth&&!auth.sq)h+='<div class="note">Set two security questions so you can reset your PIN if you forget it. <button class="link" data-act="sq">Set now</button></div>';
+  if(empty)h+='<section class="card"><h2 class="ttl">Start tracking</h2><p class="muted">Add today\'s first expense, set up your EMIs and note who you borrowed from. Everything saves on this device automatically.</p><div class="row"><button class="btn primary" data-act="tab" data-tab="add">Add expense</button><button class="btn" data-act="loadEx">Preview with example data</button></div></section>';
+
+  const al=DB.emis.map(e=>({e:e,i:emiInfo(e)})).filter(x=>!x.i.done&&(x.i.st==='over'||x.i.st==='soon')).sort((a,b)=>a.i.days-b.i.days);
+  if(al.length){
+    h+='<section class="card"><h2 class="sec"><span>EMI alerts</span><span>'+DB.settings.alertDays+' days before due</span></h2>'+al.map(x=>'<div class="arow '+x.i.st+'"><div class="grow"><strong>'+esc(x.e.name)+'</strong><span class="small">'+inr(x.e.amount)+' · '+whenText(x.i)+'</span></div><button class="btn small primary" data-act="payEmi" data-id="'+x.e.id+'">Mark paid</button></div>').join('')+'</section>';
+  }
+
+  let delta='';
+  if(prev>0){const d=tot-prev;delta='<p class="muted small">'+inr(Math.abs(d))+(d>=0?' more':' less')+' than '+monthLabel(prevK)+' ('+inr(prev)+')</p>'}
+  else delta='<p class="muted small">'+list.length+(list.length===1?' entry':' entries')+' this month</p>';
+  h+='<section class="hero"><span class="sec">Spent in '+monthLabel(k)+'</span><div class="big">'+inr(tot)+'</div>'+delta+'</section>';
+
+    const p=k.split('-').map(Number),n=dim(p[0],p[1]);
+  const arr=Array(n).fill(0);
+  list.forEach(e=>{arr[Number(e.date.slice(8,10))-1]+=e.amount});
+  const mx=Math.max.apply(null,arr),td=today();
+  const peak=arr.indexOf(mx);
+  h+='<section class="card"><h2 class="sec"><span>Day by day</span><span>'+(mx>0?'Highest '+inr(mx)+' on '+fmtDate(k+'-'+pad(peak+1)):'')+'</span></h2><div class="daily" role="img" aria-label="Daily spending for '+monthLabel(k)+'">'+arr.map((v,i)=>{
+    const d=k+'-'+pad(i+1);
+    const cls=v===0?'zero':(d===td?'today':'');
+    const ht=v===0?'2px':Math.max(v/mx*100,3).toFixed(1)+'%';
+    return '<div class="dcol" title="'+fmtDate(d)+': '+inr(v)+'"><i class="'+cls+'" style="height:'+ht+'"></i></div>';
+  }).join('')+'</div><div class="dlab"><span>1</span><span>'+Math.ceil(n/2)+'</span><span>'+n+'</span></div></section>';
+
+  const ms=[];for(let i=5;i>=0;i--)ms.push(shiftMonth(k,-i));
+  const tots=ms.map(m=>sum(monthExpenses(m)));
+  const mx6=Math.max.apply(null,tots);
+  h+='<section class="card"><h2 class="sec"><span>Last 6 months</span><span>Tap a bar to open it</span></h2><div class="mchart">'+ms.map((m,i)=>{
+    const v=tots[i];
+    const ht=v?Math.max(v/mx6*100,3).toFixed(1)+'%':'2px';
+    return '<button class="mcol'+(m===k?' sel':'')+'" data-act="setMonth" data-m="'+m+'" aria-label="'+monthLabel(m)+': '+inr(v)+'"><span class="mval num">'+(v?compact(v):'0')+'</span><span class="mbar"><i style="height:'+ht+'"></i></span><span class="mname">'+MONTHS[Number(m.slice(5))-1].slice(0,3)+'</span></button>';
+  }).join('')+'</div><p class="muted small">Amounts in rupees (k = thousand, L = lakh)</p></section>';
+
+  const by={};list.forEach(e=>{by[e.category]=(by[e.category]||0)+e.amount});
+  const rows=CATS.filter(c=>by[c]).sort((a,b)=>by[b]-by[a]);
+  h+='<section class="card"><h2 class="sec"><span>Where it went</span><span>Tap to see entries</span></h2>';
+  if(!rows.length)h+='<p class="muted">No expenses in '+monthLabel(k)+' yet.</p>';
+  else h+=rows.map(c=>{
+    const pct=by[c]/tot*100;
+    let sub='';
+    if(c==='Loan'){
+      const lt={};list.filter(e=>e.category==='Loan').forEach(e=>{const n=e.loanType||'Loan';lt[n]=(lt[n]||0)+e.amount});
+      sub='<span class="muted small">'+Object.keys(lt).map(n=>esc(n)+' '+inr(lt[n])).join(' · ')+'</span>';
+    }
+    return '<button class="brow" data-act="goCat" data-c="'+c+'"><span class="bhead"><span class="dot" style="background:var(--'+CVAR[c].slice(2)+')"></span><strong class="grow">'+c+'</strong><span class="muted small">'+pct.toFixed(0)+'%</span><span class="num amt">'+inr(by[c])+'</span></span><span class="track"><i style="width:'+pct.toFixed(1)+'%;background:var('+CVAR[c]+')"></i></span>'+sub+'</button>';
+  }).join('');
+  h+='</section>';
+
+
+  const ps=DB.people.map(x=>({p:x,s:personStats(x)})).filter(x=>x.s.rem>0).sort((a,b)=>b.s.rem-a.s.rem);
+  const owe=ps.reduce((s,x)=>s+x.s.rem,0);
+  h+='<section class="card"><h2 class="sec"><span>Money to give back</span><span class="num">'+inr(owe)+'</span></h2>';
+  if(!ps.length)h+='<p class="muted">Nothing pending.</p>';
+  else h+='<div class="list">'+ps.map(x=>'<div class="lrow"><span class="grow"><strong>'+esc(x.p.name)+'</strong><span class="muted small">Repaid '+inr(x.s.r)+' of '+inr(x.s.b)+'</span></span><span class="num amt">'+inr(x.s.rem)+'</span></div>').join('')+'</div>';
+  h+='</section>';
+
+    const rs=DB.lent.map(x=>({p:x,s:personStats(x)})).filter(x=>x.s.rem>0).sort((a,b)=>b.s.rem-a.s.rem);
+  const rec=rs.reduce((s,x)=>s+x.s.rem,0);
+  h+='<section class="card"><h2 class="sec"><span>Money to receive</span><span class="num">'+inr(rec)+'</span></h2>';
+  if(!rs.length)h+='<p class="muted">Nobody owes you right now.</p>';
+  else h+='<div class="list">'+rs.map(x=>'<div class="lrow"><span class="grow"><strong>'+esc(x.p.name)+'</strong><span class="muted small">Received '+inr(x.s.r)+' of '+inr(x.s.b)+'</span></span><span class="num amt">'+inr(x.s.rem)+'</span></div>').join('')+'</div>';
+  h+='</section>';
+
+  const up=DB.emis.filter(e=>!emiDone(e)).sort((a,b)=>a.due<b.due?-1:1);
+  const mon=sum(up);
+  h+='<section class="card"><h2 class="sec"><span>EMI dates</span><span class="num">'+inr(mon)+' / month</span></h2>';
+  if(!up.length)h+='<p class="muted">No EMIs added yet.</p>';
+  else h+='<div class="list">'+up.slice(0,5).map(e=>{const i=emiInfo(e);return '<div class="lrow"><span class="grow"><strong>'+esc(e.name)+'</strong><span class="muted small">'+fmtDateY(e.due)+'</span></span>'+pillFor(i)+'<span class="num amt">'+inr(e.amount)+'</span></div>'}).join('')+'</div><button class="link" data-act="tab" data-tab="emi">All EMIs</button>';
+  h+='</section>';
+  return h;
+}
+
+function expRow(e){
+  const sub=[e.category];
+  if(e.loanType)sub.push(esc(e.loanType));
+  if(e.lender)sub.push(esc(e.lender));
+  const del=UI.arm==='x'+e.id?'<button class="btn small danger" data-act="delExp" data-id="'+e.id+'">Delete?</button>':'<button class="x" data-act="delExp" data-id="'+e.id+'" aria-label="Delete expense">'+I.trash+'</button>';
+  return '<div class="lrow"><span class="dot" style="background:var('+CVAR[e.category]+')"></span><span class="grow"><strong>'+esc(e.note||e.category)+'</strong><span class="muted small">'+sub.join(' · ')+'</span></span><span class="num amt">'+inr(e.amount)+'</span>'+del+'</div>';
+}
+function vList(){
+  let list=monthExpenses(UI.month);
+  if(UI.cat!=='All')list=list.filter(e=>e.category===UI.cat);
+  list.sort((a,b)=>a.date===b.date?(b.ts||0)-(a.ts||0):(a.date<b.date?1:-1));
+  let h='<h1 class="page">Expenses</h1>'+monthNav();
+  h+='<div class="chips">'+['All'].concat(CATS).map(c=>'<button class="chip'+(UI.cat===c?' on':'')+'" data-act="fcat" data-c="'+c+'">'+c+'</button>').join('')+'</div>';
+  h+='<section class="card"><h2 class="sec"><span>'+(UI.cat==='All'?'All categories':UI.cat)+'</span><span class="num">'+inr(sum(list))+'</span></h2>';
+  if(!list.length)h+='<p class="muted">Nothing here for '+monthLabel(UI.month)+'.</p>';
+  else{
+    const groups={};list.forEach(e=>{(groups[e.date]=groups[e.date]||[]).push(e)});
+    h+=Object.keys(groups).sort().reverse().map(d=>'<div><div class="dayhead"><span>'+fmtDateY(d)+'</span><span class="num">'+inr(sum(groups[d]))+'</span></div><div class="list">'+groups[d].map(expRow).join('')+'</div></div>').join('');
+  }
+  return h+'</section>';
+}
+
+function vAdd(){
+  const d=UI.draft;
+  let h='<h1 class="page">Add expense</h1><form id="addForm" class="card form" novalidate>';
+  h+='<label>Amount (₹)<input id="fAmt" type="number" inputmode="decimal" step="any" min="0" placeholder="0" value="'+esc(d.amt)+'" autocomplete="off"></label>';
+  h+='<div class="grow"><span class="lbl">Category</span><div class="chips" style="margin-top:6px">'+CATS.map(c=>'<button type="button" class="chip'+(d.cat===c?' on':'')+'" data-act="cat" data-c="'+c+'"><span class="dot" style="background:var('+CVAR[c]+')"></span>'+c+'</button>').join('')+'</div></div>';
+  if(d.cat==='Loan'){
+    h+='<div class="loanbox"><div class="grow"><span class="lbl">Loan type</span><span class="muted small">Drag a type into the box, or just tap it.</span></div>';
+    h+='<div class="chips">'+LOAN_TYPES.map(t=>'<button type="button" class="chip drag'+(d.lt===t?' on':'')+'" data-lt="'+t+'">'+t+'</button>').join('')+'</div>';
+    h+='<div id="dropZone" class="drop'+(d.lt?' filled':'')+'">'+(d.lt?'<span class="chip on">'+esc(d.lt)+'<button type="button" class="cx" data-act="clearLt" aria-label="Clear loan type">×</button></span>':'Drop loan type here')+'</div>';
+    h+='<label>Borrowed from / loan name<input id="fLender" list="lenders" placeholder="e.g. Ramesh, SBI" value="'+esc(d.lender)+'" autocomplete="off"></label><datalist id="lenders">'+knownLenders().map(n=>'<option value="'+esc(n)+'"></option>').join('')+'</datalist>';
+    h+='<label class="check" id="repayRow" hidden><input id="fRepay" type="checkbox"'+(d.repay?' checked':'')+'><span>Also record this as a repayment to <b id="repayName"></b> in Udhaar</span></label></div>';
+  }
+  h+='<label>Note<input id="fNote" placeholder="What was it for?" value="'+esc(d.note)+'" autocomplete="off"></label>';
+  h+='<label>Date<input id="fDate" type="date" value="'+esc(d.date)+'"></label>';
+  h+='<button class="btn primary" type="submit">Add expense</button></form>';
+  const td=DB.expenses.filter(e=>e.date===today()).sort((a,b)=>(b.ts||0)-(a.ts||0));
+  h+='<section class="card"><h2 class="sec"><span>Today</span><span class="num">'+inr(sum(td))+'</span></h2>';
+  h+=td.length?'<div class="list">'+td.map(expRow).join('')+'</div>':'<p class="muted">No entries today yet.</p>';
+  return h+'</section>';
+}
+
+function vEmi(){
+  const act=DB.emis.filter(e=>!emiDone(e)).sort((a,b)=>a.due<b.due?-1:1);
+  const done=DB.emis.filter(emiDone);
+  let h='<div class="pagehead"><h1 class="page">EMIs</h1><button class="btn primary small" data-act="addEmi">Add EMI</button></div>';
+  h+='<section class="card"><h2 class="sec"><span>Every month</span><span class="num">'+inr(sum(act))+'</span></h2><p class="muted small">'+act.length+' active '+(act.length===1?'loan':'loans')+'. You get an alert on the dashboard '+DB.settings.alertDays+' days before each due date.</p></section>';
+  if(!DB.emis.length)h+='<section class="card"><p class="muted">No EMIs yet. Add your home, car or personal loan EMI with its due date.</p></section>';
+  h+=act.concat(done).map(e=>{
+    const i=emiInfo(e);
+    const pct=e.total?Math.min(100,e.paid/e.total*100):0;
+    return '<article class="card"><div class="row between"><div class="grow"><h3 class="ttl">'+esc(e.name)+'</h3><span class="muted small">'+esc(e.type)+(e.lender?' · '+esc(e.lender):'')+'</span></div><span class="num big-s">'+inr(e.amount)+'</span></div>'+
+      '<div class="row">'+pillFor(i)+(i.done?'':'<span class="muted small">Next EMI '+fmtDateY(e.due)+'</span>')+'</div>'+
+      (e.total?'<div class="grow"><div class="prog"><i style="width:'+pct.toFixed(1)+'%"></i></div><span class="muted small">'+e.paid+' of '+e.total+' paid · '+Math.max(0,e.total-e.paid)+' left</span></div>':'<span class="muted small">'+e.paid+' EMIs paid</span>')+
+      '<div class="row"><button class="btn small primary" data-act="payEmi" data-id="'+e.id+'"'+(i.done?' disabled':'')+'>Mark paid</button><button class="btn small ghost" data-act="undoEmi" data-id="'+e.id+'"'+(e.paid?'':' disabled')+'>Undo last</button><button class="btn small ghost danger" data-act="delEmi" data-id="'+e.id+'">Delete</button></div></article>';
+  }).join('');
+  return h;
+}
+
+const KIND={
+  borrow:{out:'borrow',back:'repay',cols:['Borrowed','Repaid','Remaining'],head:'Money you borrowed from people',add:'Add borrowing',more:'Borrow more',settle:'Repay',outLbl:'Borrowed',backLbl:'Repaid',left:'left to pay',none:'Nobody yet. Tap Add borrowing when you take money from someone.'},
+  lend:{out:'lend',back:'receive',cols:['Given','Received back','Pending'],head:'Money you gave to people',add:'Add lending',more:'Give more',settle:'Received',outLbl:'Given',backLbl:'Received',left:'left to receive',none:'Nobody yet. Tap Add lending when you give money to someone.'}
+};
+const listOf=k=>k==='lend'?DB.lent:DB.people;
+function vUdhaar(){
+  const kind=UI.ud==='lend'?'lend':'borrow',K=KIND[kind];
+  const ps=listOf(kind).map(p=>({p:p,s:personStats(p)})).sort((a,b)=>b.s.rem-a.s.rem);
+  const B=ps.reduce((s,x)=>s+x.s.b,0),R=ps.reduce((s,x)=>s+x.s.r,0);
+  let h='<div class="pagehead"><h1 class="page">Udhaar</h1><button class="btn primary small" data-act="addPerson">'+K.add+'</button></div>';
+  h+='<div class="chips"><button class="chip'+(kind==='borrow'?' on':'')+'" data-act="ud" data-kind="borrow">I borrowed</button><button class="chip'+(kind==='lend'?' on':'')+'" data-act="ud" data-kind="lend">I lent</button></div>';
+  h+='<section class="card"><h2 class="sec"><span>'+K.head+'</span></h2><div class="stats"><div class="stat"><span class="muted small">'+K.cols[0]+'</span><span class="num">'+inr(B)+'</span></div><div class="stat"><span class="muted small">'+K.cols[1]+'</span><span class="num">'+inr(R)+'</span></div><div class="stat"><span class="muted small">'+K.cols[2]+'</span><span class="num">'+inr(B-R)+'</span></div></div></section>';
+  if(!ps.length)h+='<section class="card"><p class="muted">'+K.none+'</p></section>';
+  h+=ps.map(x=>{
+    const p=x.p,s=x.s,pct=s.b?Math.min(100,s.r/s.b*100):0,open=UI.open[p.id];
+    let hist='';
+    if(open){
+      const es=p.entries.slice().sort((a,b)=>a.date===b.date?0:(a.date<b.date?1:-1));
+      hist='<div class="list">'+es.map(en=>{
+        const del=UI.arm==='h'+en.id?'<button class="btn small danger" data-act="delEntry" data-kind="'+kind+'" data-id="'+p.id+'" data-eid="'+en.id+'">Delete?</button>':'<button class="x" data-act="delEntry" data-kind="'+kind+'" data-id="'+p.id+'" data-eid="'+en.id+'" aria-label="Delete entry">'+I.trash+'</button>';
+        return '<div class="lrow"><span class="grow"><strong>'+(en.type===K.out?K.outLbl:K.backLbl)+'</strong><span class="muted small">'+fmtDateY(en.date)+(en.note?' · '+esc(en.note):'')+'</span></span><span class="num amt">'+inr(en.amount)+'</span>'+del+'</div>';
+      }).join('')+'</div>';
+    }
+    return '<article class="card"><div class="row between"><div class="grow"><h3 class="ttl">'+esc(p.name)+'</h3><span class="muted small">'+K.outLbl+' '+inr(s.b)+' · '+K.backLbl+' '+inr(s.r)+'</span></div><div class="grow" style="text-align:right;justify-items:end">'+(s.rem<=0?'<span class="pill good">Cleared</span>':'<span class="num big-s">'+inr(s.rem)+'</span><span class="muted small">'+K.left+'</span>')+'</div></div>'+
+      '<div class="prog"><i style="width:'+pct.toFixed(1)+'%"></i></div>'+
+      '<div class="row"><button class="btn small primary" data-act="entry" data-kind="'+kind+'" data-id="'+p.id+'" data-type="'+K.back+'">'+K.settle+'</button><button class="btn small" data-act="entry" data-kind="'+kind+'" data-id="'+p.id+'" data-type="'+K.out+'">'+K.more+'</button><button class="btn small ghost" data-act="hist" data-id="'+p.id+'">'+(open?'Hide history':'History')+'</button><button class="btn small ghost danger" data-act="delPerson" data-kind="'+kind+'" data-id="'+p.id+'">Delete</button></div>'+hist+'</article>';
+  }).join('');
+  return h;
+}
+
+function vSettings(){
+  let h='<h1 class="page">Settings</h1>';
+  h+='<section class="card"><h2 class="sec">Security</h2><p class="muted small">The app asks for your PIN every time it opens, and again after a minute in the background.</p><div class="row"><button class="btn" data-act="lock">Lock now</button><button class="btn" data-act="pin">Change PIN</button><button class="btn" data-act="sq">'+(auth&&auth.sq?'Change security questions':'Set security questions')+'</button></div></section>';
+  h+='<section class="card"><h2 class="sec">EMI alerts</h2><label>Alert me before the due date<select id="alertSel">'+[1,2,3,4,5,6,7,10].map(n=>'<option value="'+n+'"'+(DB.settings.alertDays===n?' selected':'')+'>'+n+(n===1?' day':' days')+' before</option>').join('')+'</select></label><p class="muted small">Alerts show at the top of the dashboard. In the Android app you also get phone notifications at 9 AM on the alert day, the day before, on the due day, and after it while unpaid.</p></section>';
+  h+='<section class="card"><h2 class="sec">Backup</h2><p class="muted small">Data is saved on this device automatically. Keep a copy somewhere safe in case you change phones.</p><div class="row"><button class="btn" data-act="copyBackup">Copy backup</button><button class="btn" data-act="restore">Restore backup</button></div></section>';
+  h+='<section class="card"><h2 class="sec">Data</h2><div class="row">'+(hasEx()?'<button class="btn" data-act="rmEx">Remove example data</button>':'<button class="btn" data-act="loadEx">Load example data</button>')+'<button class="btn danger" data-act="erase">Erase everything</button></div></section>';
+  return h;
+}
+
+function render(){
+  const f={dash:vDash,list:vList,add:vAdd,emi:vEmi,udhaar:vUdhaar,settings:vSettings}[UI.tab];
+  $('#view').innerHTML=f();
+  document.querySelectorAll('.tab').forEach(b=>{if(b.dataset.tab===UI.tab)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});
+  if(UI.tab==='add')updateRepayRow();
+}
+function setTab(t){UI.tab=t;UI.arm=null;render();window.scrollTo(0,0)}
+
+/* ---------- toast & sheet ---------- */
+let toastT=null;
+function toast(m){const t=$('#toast');t.textContent=m;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>{t.hidden=true},2600)}
+let sheetSubmit=null;
+function openSheet(title,body,submit,ok,noCancelLabel){
+  $('#sheetTitle').textContent=title;
+  $('#sheetBody').innerHTML=body+'<p class="err" id="sheetErr" hidden></p><div class="row end"><button type="button" class="btn ghost" data-act="closeSheet">Cancel</button><button type="submit" class="btn primary">'+(ok||'Save')+'</button></div>';
+  sheetSubmit=submit;
+  $('#sheetWrap').hidden=false;
+  const first=$('#sheetBody input:not([type=checkbox]),#sheetBody select,#sheetBody textarea');
+  if(first)setTimeout(()=>first.focus(),30);
+}
+function closeSheet(){$('#sheetWrap').hidden=true;sheetSubmit=null}
+$('#sheetForm').addEventListener('submit',async ev=>{
+  ev.preventDefault();
+  if(!sheetSubmit)return;
+  let r;
+  try{r=await sheetSubmit(new FormData(ev.target))}catch(err){r='Something went wrong. Please try again.'}
+  const er=$('#sheetErr');
+  if(r===true)closeSheet();
+  else if(typeof r==='string'&&er){er.textContent=r;er.hidden=false}
+});
+$('#sheetWrap').addEventListener('click',e=>{if(e.target.id==='sheetWrap')closeSheet()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#sheetWrap').hidden)closeSheet()});
+
+function arm(key,fn){
+  if(UI.arm===key){UI.arm=null;fn()}
+  else{UI.arm=key;render();setTimeout(()=>{if(UI.arm===key){UI.arm=null;render()}},3000)}
+}
+
+/* ---------- forms ---------- */
+function submitAdd(){
+  const d=UI.draft,amt=parseFloat(d.amt);
+  if(!(amt>0)){toast('Enter an amount first');const f=$('#fAmt');if(f)f.focus();return}
+  if(!d.date){toast('Pick a date');return}
+  const ex={id:uid(),ts:Date.now(),date:d.date,amount:round2(amt),category:d.cat,note:d.note.trim()};
+  if(d.cat==='Loan'){if(d.lt)ex.loanType=d.lt;if(d.lender.trim())ex.lender=d.lender.trim()}
+  DB.expenses.push(ex);
+  let extra='';
+  if(d.cat==='Loan'&&d.repay){
+    const p=findPerson(d.lender);
+    if(p){p.entries.push({id:uid(),date:d.date,type:'repay',amount:ex.amount,note:ex.note||'From expense entry'});extra=' and repayment saved for '+p.name}
+  }
+  save();d.amt='';d.note='';render();
+  toast('Added '+inr(ex.amount)+' to '+ex.category+extra);
+}
+function updateRepayRow(){
+  const r=$('#repayRow');if(!r)return;
+  const p=UI.draft.cat==='Loan'?findPerson(UI.draft.lender):null;
+  r.hidden=!p;
+  if(p){$('#repayName').textContent=p.name;$('#fRepay').checked=UI.draft.repay}
+}
+function selectLt(t){UI.draft.lt=t;render()}
+
+function openEmiSheet(){
+  openSheet('Add EMI',
+    '<label>Loan name<input name="name" required placeholder="e.g. Home Loan SBI" autocomplete="off"></label>'+
+    '<label>Type<select name="type">'+LOAN_TYPES.map(t=>'<option>'+t+'</option>').join('')+'</select></label>'+
+    '<label>Bank or lender (optional)<input name="lender" autocomplete="off"></label>'+
+    '<div class="two"><label>EMI amount (₹)<input name="amount" type="number" inputmode="decimal" step="any" min="1"></label><label>Next due date<input name="due" type="date" value="'+shiftDays(today(),7)+'"></label></div>'+
+    '<div class="two"><label>Total EMIs (optional)<input name="total" type="number" inputmode="numeric" step="1" min="0" placeholder="e.g. 240"></label><label>EMIs already paid<input name="paid" type="number" inputmode="numeric" step="1" min="0" value="0"></label></div>',
+    fd=>{
+      const name=String(fd.get('name')||'').trim(),amount=parseFloat(fd.get('amount')),due=fd.get('due');
+      const total=parseInt(fd.get('total'),10)||0,paid=parseInt(fd.get('paid'),10)||0;
+      if(!name)return 'Enter a loan name.';
+      if(!(amount>0))return 'Enter the EMI amount.';
+      if(!due)return 'Pick the next due date.';
+      if(total&&paid>total)return 'Paid EMIs cannot be more than total EMIs.';
+      DB.emis.push({id:uid(),name:name,type:fd.get('type'),lender:String(fd.get('lender')||'').trim(),amount:round2(amount),due:due,dueDay:parseD(due).getDate(),total:total,paid:paid});
+      save();render();toast('EMI added');return true;
+    },'Add EMI');
+}
+function openPersonSheet(kind){
+  kind=kind==='lend'?'lend':'borrow';
+  const K=KIND[kind];
+  openSheet(K.add,
+    '<label>'+(kind==='lend'?'Lent to':'Borrowed from')+'<input name="name" placeholder="Person name" autocomplete="off"></label>'+
+    '<div class="two"><label>Amount (₹)<input name="amount" type="number" inputmode="decimal" step="any" min="0.01"></label><label>Date<input name="date" type="date" value="'+today()+'"></label></div>'+
+    '<label>Note (optional)<input name="note" autocomplete="off"></label>',
+    fd=>{
+      const name=String(fd.get('name')||'').trim(),amount=parseFloat(fd.get('amount')),date=fd.get('date');
+      if(!name)return kind==='lend'?'Enter who you lent to.':'Enter who you borrowed from.';
+      if(!(amount>0))return 'Enter the amount.';
+      if(!date)return 'Pick a date.';
+      const list=listOf(kind);
+      if(list.some(p=>p.name.trim().toLowerCase()===name.toLowerCase()))return name+' is already in the list. Use "'+K.more+'" on their card.';
+      list.push({id:uid(),name:name,entries:[{id:uid(),date:date,type:K.out,amount:round2(amount),note:String(fd.get('note')||'').trim()}]});
+      save();render();toast('Added '+name);return true;
+    },'Add');
+}
+function openEntrySheet(pid,type,kind){
+  kind=kind==='lend'?'lend':'borrow';
+  const K=KIND[kind],lend=kind==='lend';
+  const p=listOf(kind).find(x=>x.id===pid);if(!p)return;
+  const st=personStats(p),settle=type===K.back;
+  const title=settle?(lend?'Received from ':'Repay ')+p.name:(lend?'Give more to ':'Borrow more from ')+p.name;
+  openSheet(title,
+    '<p class="muted">'+(settle?(lend?'Pending now ':'Remaining now ')+inr(st.rem):K.outLbl+' so far '+inr(st.b))+'</p>'+
+    '<div class="two"><label>Amount (₹)<input name="amount" type="number" inputmode="decimal" step="any" min="0.01"></label><label>Date<input name="date" type="date" value="'+today()+'"></label></div>'+
+    '<label>Note (optional)<input name="note" autocomplete="off"></label>'+
+    (settle&&!lend?'<label class="check"><input type="checkbox" name="exp" checked><span>Also add to my expenses under Loan</span></label>':''),
+    fd=>{
+      const amount=round2(parseFloat(fd.get('amount'))),date=fd.get('date'),note=String(fd.get('note')||'').trim();
+      if(!(amount>0))return 'Enter the amount.';
+      if(!date)return 'Pick a date.';
+      if(settle&&amount>st.rem+0.001)return 'That is more than the '+(lend?'pending ':'remaining ')+inr(st.rem)+'.';
+      p.entries.push({id:uid(),date:date,type:type,amount:amount,note:note});
+      if(settle&&!lend&&fd.get('exp'))DB.expenses.push({id:uid(),ts:Date.now(),date:date,amount:amount,category:'Loan',lender:p.name,note:note||'Repaid '+p.name});
+      save();render();toast((settle?(lend?'Payment received':'Repayment'):(lend?'Lending':'Borrowing'))+' saved');return true;
+    },settle?(lend?'Save received':'Save repayment'):'Save');
+}
+function confirmSheet(title,msg,label,fn){
+  openSheet(title,'<p>'+msg+'</p>',()=>{fn();return true},label);
+}
+
+/* ---------- backup ---------- */
+async function copyBackup(){
+  const txt=JSON.stringify({app:'kharcha-khata',v:1,data:DB});
+  try{await navigator.clipboard.writeText(txt);toast('Backup copied. Paste it somewhere safe.')}
+  catch(e){
+    openSheet('Backup','<p class="muted">Copy this text and keep it somewhere safe.</p><textarea id="bk" readonly>'+esc(txt)+'</textarea>',()=>true,'Done');
+    setTimeout(()=>{const t=$('#bk');if(t)t.select()},60);
+  }
+}
+function restoreSheet(){
+  openSheet('Restore backup','<p class="muted">Paste a backup you copied earlier. This replaces the data on this device.</p><label>Backup text<textarea name="json"></textarea></label>',fd=>{
+    let o;
+    try{o=JSON.parse(String(fd.get('json')||'').trim())}catch(e){return 'That does not look like a backup.'}
+    const d=o&&o.data?o.data:o;
+    if(!d||!Array.isArray(d.expenses)||!Array.isArray(d.emis)||!Array.isArray(d.people))return 'That backup is missing data.';
+    DB={expenses:d.expenses,emis:d.emis,people:d.people,lent:Array.isArray(d.lent)?d.lent:[],settings:Object.assign({alertDays:5},d.settings||{})};
+    save();render();toast('Backup restored');return true;
+  },'Restore');
+}
+
+/* ---------- example data ---------- */
+function loadExamples(){
+  const t=today(),d=n=>shiftDays(t,-n);
+  const E=(date,amount,category,note,extra)=>Object.assign({id:uid(),ts:Date.now()+Math.random(),date:date,amount:amount,category:category,note:note,ex:true},extra||{});
+  DB.expenses.push(
+    E(d(0),60,'Home','Milk'),E(d(1),2450,'Home','Groceries'),E(d(2),320,'Personal','Auto fare and lunch'),
+    E(d(3),1860,'Home','Electricity bill'),E(d(4),1200,'Office','Team lunch'),E(d(5),500,'Other','Gift'),
+    E(d(6),5000,'Loan','Part repayment',{loanType:'Personal Loan',lender:'Ramesh'}),E(d(7),899,'Personal','Mobile recharge'),
+    E(d(9),640,'Home','Vegetables'),
+    E(d(14),2100,'Home','Groceries'),E(d(16),950,'Office','Travel'),E(d(18),1500,'Personal','Clothes'),
+    E(d(25),18500,'Loan','Home Loan SBI EMI',{loanType:'Home Loan',lender:'SBI'}),
+    E(d(27),12400,'Loan','Car Loan EMI',{loanType:'Car Loan',lender:'HDFC Bank'}),
+    E(d(12),4200,'Loan','Bajaj EMI',{loanType:'Personal Loan',lender:'Bajaj Finance'})
+  );
+  const M=(name,type,lender,amount,off,total,paid)=>{const due=shiftDays(t,off);return {id:uid(),name:name,type:type,lender:lender,amount:amount,due:due,dueDay:parseD(due).getDate(),total:total,paid:paid,ex:true}};
+  DB.emis.push(M('Home Loan SBI','Home Loan','SBI',18500,5,240,10),M('Car Loan HDFC','Car Loan','HDFC Bank',12400,3,60,11),M('Bajaj Personal Loan','Personal Loan','Bajaj Finance',4200,18,36,7));
+  DB.people.push(
+    {id:uid(),name:'Ramesh',ex:true,entries:[{id:uid(),date:d(70),type:'borrow',amount:50000,note:'Shop deposit'},{id:uid(),date:d(40),type:'repay',amount:10000,note:''},{id:uid(),date:d(6),type:'repay',amount:5000,note:'Part repayment'}]},
+    {id:uid(),name:'Priya',ex:true,entries:[{id:uid(),date:d(20),type:'borrow',amount:8000,note:'Urgent need'}]}
+  );
+    DB.lent.push(
+    {id:uid(),name:'Suresh',ex:true,entries:[{id:uid(),date:d(30),type:'lend',amount:15000,note:'Business help'},{id:uid(),date:d(10),type:'receive',amount:5000,note:''}]},
+    {id:uid(),name:'Anita',ex:true,entries:[{id:uid(),date:d(8),type:'lend',amount:3000,note:'Fees'}]}
+  );
+  save();render();toast('Example data loaded');
+}
+function rmExamples(){
+  DB.expenses=DB.expenses.filter(x=>!x.ex);DB.emis=DB.emis.filter(x=>!x.ex);DB.people=DB.people.filter(x=>!x.ex);DB.lent=DB.lent.filter(x=>!x.ex);
+  save();render();toast('Example data removed');
+}
+
+/* ---------- click handling ---------- */
+document.addEventListener('click',e=>{
+  const lt=e.target.closest('[data-lt]');
+  if(lt&&e.detail===0){selectLt(lt.dataset.lt);return}
+  const b=e.target.closest('[data-act]');
+  if(!b)return;
+  const a=b.dataset.act,id=b.dataset.id;
+  switch(a){
+    case 'tab':setTab(b.dataset.tab);break;
+    case 'closeSheet':closeSheet();break;
+    case 'mprev':UI.month=shiftMonth(UI.month,-1);render();break;
+    case 'mnext':UI.month=shiftMonth(UI.month,1);render();break;
+    case 'cat':UI.draft.cat=b.dataset.c;render();break;
+    case 'clearLt':UI.draft.lt='';render();break;
+    case 'goCat':UI.cat=b.dataset.c;setTab('list');break;
+    case 'fcat':UI.cat=b.dataset.c;render();break;
+    case 'delExp':arm('x'+id,()=>{DB.expenses=DB.expenses.filter(x=>x.id!==id);save();render();toast('Expense deleted')});break;
+    case 'payEmi':{
+      const m=DB.emis.find(x=>x.id===id);if(!m||emiDone(m))break;
+      m.paid++;
+      DB.expenses.push({id:uid(),ts:Date.now(),date:today(),amount:m.amount,category:'Loan',loanType:m.type,lender:m.lender||m.name,note:m.name+' EMI'+(m.total?' '+m.paid+'/'+m.total:''),emiId:m.id});
+      m.due=addMonths(m.due,1,m.dueDay);
+      save();render();toast('EMI paid and added to expenses');break;
+    }
+    case 'undoEmi':{
+      const m=DB.emis.find(x=>x.id===id);if(!m||m.paid<1)break;
+      m.paid--;m.due=addMonths(m.due,-1,m.dueDay);
+      for(let i=DB.expenses.length-1;i>=0;i--){if(DB.expenses[i].emiId===m.id){DB.expenses.splice(i,1);break}}
+      save();render();toast('Last EMI payment undone');break;
+    }
+    case 'addEmi':openEmiSheet();break;
+    case 'delEmi':{const m=DB.emis.find(x=>x.id===id);if(m)confirmSheet('Delete '+esc(m.name)+'?','This removes the EMI. Expenses you already logged stay.','Delete',()=>{DB.emis=DB.emis.filter(x=>x.id!==id);save();render();toast('EMI deleted')});break}
+    case 'addPerson':openPersonSheet(UI.ud);break;
+    case 'entry':openEntrySheet(id,b.dataset.type,b.dataset.kind);break;
+    case 'ud':UI.ud=b.dataset.kind==='lend'?'lend':'borrow';render();break;
+    case 'setMonth':UI.month=b.dataset.m;render();break;
+    case 'delEntry':{const eid=b.dataset.eid,kd=b.dataset.kind;arm('h'+eid,()=>{const p=listOf(kd).find(x=>x.id===id);if(p){p.entries=p.entries.filter(x=>x.id!==eid);save();render();toast('Entry deleted')}});break}
+    case 'delPerson':{const kd=b.dataset.kind,p=listOf(kd).find(x=>x.id===id);if(p)confirmSheet('Delete '+esc(p.name)+'?','This removes the whole history for '+esc(p.name)+'.','Delete',()=>{if(kd==='lend')DB.lent=DB.lent.filter(x=>x.id!==id);else DB.people=DB.people.filter(x=>x.id!==id);save();render();toast('Deleted')});break}
+    case 'hist':UI.open[id]=!UI.open[id];render();break;
+    case 'lock':lockNow();break;
+    case 'pin':openPinSheet();break;
+    case 'copyBackup':copyBackup();break;
+    case 'restore':restoreSheet();break;
+    case 'loadEx':loadExamples();break;
+    case 'rmEx':rmExamples();break;
+    case 'erase':confirmSheet('Erase everything?','All expenses, EMIs and borrowings on this device will be deleted. Your PIN stays.','Erase',()=>{DB=blank();save();render();toast('All data erased')});break;
+    case 'forgot':openForgotSheet();break;
+    case 'eraseReset':eraseResetSheet('');break;
+    case 'sq':openSecuritySheet(true);break;
+  }
+});
+document.addEventListener('input',e=>{
+  const t=e.target,d=UI.draft;
+  if(t.id==='fAmt')d.amt=t.value;
+  else if(t.id==='fNote')d.note=t.value;
+  else if(t.id==='fLender'){d.lender=t.value;updateRepayRow()}
+});
+document.addEventListener('change',e=>{
+  const t=e.target,d=UI.draft;
+  if(t.id==='fDate')d.date=t.value;
+  else if(t.id==='fRepay')d.repay=t.checked;
+  else if(t.id==='alertSel'){DB.settings.alertDays=parseInt(t.value,10)||5;save();render();toast('Alerts set to '+DB.settings.alertDays+' days before')}
+});
+document.addEventListener('submit',e=>{if(e.target.id==='addForm'){e.preventDefault();submitAdd()}});
+
+/* ---------- drag loan type into the drop box (mouse and touch) ---------- */
+let drag=null,ghost=null;
+document.addEventListener('pointerdown',e=>{
+  const c=e.target.closest('.chip.drag');
+  if(!c||(e.pointerType==='mouse'&&e.button!==0))return;
+  drag={lt:c.dataset.lt,x:e.clientX,y:e.clientY,cx:e.clientX,cy:e.clientY,moved:false,id:e.pointerId};
+});
+document.addEventListener('pointermove',e=>{
+  if(!drag||e.pointerId!==drag.id)return;
+  drag.cx=e.clientX;drag.cy=e.clientY;
+  if(!drag.moved&&Math.hypot(e.clientX-drag.x,e.clientY-drag.y)>6){
+    drag.moved=true;
+    ghost=document.createElement('div');ghost.className='chip on ghost-chip';ghost.textContent=drag.lt;
+    document.body.appendChild(ghost);document.body.classList.add('dragging');
+  }
+  if(drag.moved){
+    ghost.style.left=e.clientX+'px';ghost.style.top=e.clientY+'px';
+    const dz=$('#dropZone');
+    if(dz){const r=dz.getBoundingClientRect();dz.classList.toggle('over',e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom)}
+  }
+});
+function endDrag(cancel){
+  if(!drag)return;
+  const d=drag;drag=null;
+  if(ghost){ghost.remove();ghost=null}
+  document.body.classList.remove('dragging');
+  const dz=$('#dropZone');if(dz)dz.classList.remove('over');
+  if(cancel)return;
+  if(!d.moved){selectLt(d.lt);return}
+  if(dz){const r=dz.getBoundingClientRect();if(d.cx>=r.left&&d.cx<=r.right&&d.cy>=r.top&&d.cy<=r.bottom)selectLt(d.lt)}
+}
+document.addEventListener('pointerup',()=>endDrag(false));
+document.addEventListener('pointercancel',()=>endDrag(true));
+
+/* ---------- PIN lock ---------- */
+let auth=null;
+try{auth=JSON.parse(lsGet(KEY_AUTH)||'null')}catch(e){auth=null}
+let lockMode=auth?'enter':'setup1',buf='',first='',err='',busy=false,hiddenAt=0,unlocked=false,fails=0,lockUntil=0;
+async function hashPin(pin,salt){
+  const s=salt+':'+pin;
+  try{
+    const bytes=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));
+    return Array.from(new Uint8Array(bytes)).map(b=>b.toString(16).padStart(2,'0')).join('');
+  }catch(e){
+    let h=5381;for(let i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))|0;
+    return 'x'+(h>>>0).toString(16);
+  }
+}
+function renderLock(){
+  const T={setup1:'Create a PIN',setup2:'Confirm your PIN',enter:'Enter PIN'};
+  const S={setup1:'Choose a 4-digit PIN. The app will ask for it every time it opens.',setup2:'Type the same PIN once more.',enter:'Kharcha Khata is locked.'};
+  let keys='';
+  ['1','2','3','4','5','6','7','8','9'].forEach(k=>{keys+='<button type="button" data-k="'+k+'">'+k+'</button>'});
+  keys+='<button type="button" class="blank" tabindex="-1" aria-hidden="true"></button><button type="button" data-k="0">0</button><button type="button" data-k="del" aria-label="Delete digit">⌫</button>';
+  $('#lock').innerHTML='<div class="lockbox">'+I.lock+'<h1 class="page">'+T[lockMode]+'</h1><p class="muted">'+S[lockMode]+'</p><div class="dots'+(err?' shake':'')+'">'+[0,1,2,3].map(i=>'<span class="'+(i<buf.length?'on':'')+'"></span>').join('')+'</div><p class="err" style="min-height:1.4em">'+esc(err)+'</p><div class="keys">'+keys+'</div>'+(lockMode==='enter'?'<button type="button" class="link" data-act="forgot">Forgot PIN?</button>':'')+'</div>';
+}
+async function press(k){
+  if(busy)return;
+  err='';
+  if(k==='del'){buf=buf.slice(0,-1);renderLock();return}
+  if(buf.length>=4)return;
+  buf+=k;renderLock();
+  if(buf.length<4)return;
+  busy=true;
+  const pin=buf;
+  if(lockMode==='setup1'){first=pin;buf='';lockMode='setup2'}
+  else if(lockMode==='setup2'){
+    if(pin===first){
+      const salt=uid();auth={salt:salt,hash:await hashPin(pin,salt)};
+      lsSet(KEY_AUTH,JSON.stringify(auth));
+      busy=false;unlock();setTimeout(()=>openSecuritySheet(false),300);return;
+    }
+    err='PINs did not match. Start again.';buf='';first='';lockMode='setup1';
+  }else{
+    if(await hashPin(pin,auth.salt)===auth.hash){busy=false;unlock();return}
+    err='Wrong PIN. Try again.';buf='';
+  }
+  busy=false;renderLock();
+}
+function unlock(){
+  lockMode='enter';buf='';first='';err='';unlocked=true;
+  $('#lock').hidden=true;$('#app').hidden=false;
+  render();window.scrollTo(0,0);scheduleAlerts();
+}
+function lockNow(){
+  if(!auth)return;
+  closeSheet();
+  unlocked=false;buf='';err='';lockMode='enter';
+  $('#app').hidden=true;$('#lock').hidden=false;renderLock();
+}
+$('#lock').addEventListener('click',e=>{const k=e.target.closest('[data-k]');if(k)press(k.dataset.k)});
+document.addEventListener('keydown',e=>{
+  if($('#lock').hidden||!$('#sheetWrap').hidden)return;
+  if(/^[0-9]$/.test(e.key))press(e.key);else if(e.key==='Backspace')press('del');
+});
+document.addEventListener('visibilitychange',()=>{
+  if(document.hidden)hiddenAt=Date.now();
+  else if(unlocked&&hiddenAt&&Date.now()-hiddenAt>60000)lockNow();
+});
+function openPinSheet(){
+  const f=(n,l)=>'<label>'+l+'<input name="'+n+'" type="password" inputmode="numeric" maxlength="4" autocomplete="off"></label>';
+  openSheet('Change PIN',f('cur','Current PIN')+f('n1','New PIN (4 digits)')+f('n2','New PIN again'),async fd=>{
+    const cur=String(fd.get('cur')||''),n1=String(fd.get('n1')||''),n2=String(fd.get('n2')||'');
+    if(await hashPin(cur,auth.salt)!==auth.hash)return 'Current PIN is wrong.';
+    if(!/^\d{4}$/.test(n1))return 'New PIN must be exactly 4 digits.';
+    if(n1!==n2)return 'The new PINs do not match.';
+    auth={salt:auth.salt,hash:await hashPin(n1,auth.salt),sq:auth.sq};
+    lsSet(KEY_AUTH,JSON.stringify(auth));toast('PIN changed');return true;
+  },'Change PIN');
+}
+
+/* ---------- security questions and PIN reset ---------- */
+const norm=s=>String(s==null?'':s).toLowerCase().replace(/\s+/g,' ').trim();
+const SQ_IDEAS=["What was the name of your first school?","What is your mother's birthplace?","What was your first pet's name?","In which city did your parents meet?","What was your childhood nickname?","What is your favourite teacher's name?"];
+function openSecuritySheet(requirePin){
+  if(!auth)return;
+  const cur=auth.sq||[{q:''},{q:''}];
+  const pinField=requirePin?'<label>Current PIN<input name="cur" type="password" inputmode="numeric" maxlength="4" autocomplete="off"></label>':'';
+  const qa=i=>'<label>Question '+(i+1)+'<input name="q'+(i+1)+'" list="sqlist" autocomplete="off" placeholder="Pick one or type your own" value="'+esc(cur[i].q)+'"></label><label>Answer '+(i+1)+'<input name="a'+(i+1)+'" autocomplete="off"></label>';
+  openSheet('Security questions',
+    '<p class="muted">If you forget your PIN, answering both questions lets you set a new one. Choose answers only you know. Capital letters do not matter.</p>'+pinField+
+    '<datalist id="sqlist">'+SQ_IDEAS.map(q=>'<option value="'+esc(q)+'"></option>').join('')+'</datalist>'+qa(0)+qa(1),
+    async fd=>{
+      if(requirePin&&(await hashPin(String(fd.get('cur')||''),auth.salt))!==auth.hash)return 'Current PIN is wrong.';
+      const q1=String(fd.get('q1')||'').trim(),q2=String(fd.get('q2')||'').trim(),a1=norm(fd.get('a1')),a2=norm(fd.get('a2'));
+      if(!q1||!q2)return 'Add both questions.';
+      if(norm(q1)===norm(q2))return 'Use two different questions.';
+      if(a1.length<2||a2.length<2)return 'Each answer needs at least 2 characters.';
+      auth={salt:auth.salt,hash:auth.hash,sq:[{q:q1,h:await hashPin(a1,auth.salt+'q0')},{q:q2,h:await hashPin(a2,auth.salt+'q1')}]};
+      lsSet(KEY_AUTH,JSON.stringify(auth));
+      if(unlocked)render();
+      toast('Security questions saved');return true;
+    },'Save questions');
+}
+function eraseResetSheet(note){
+  confirmSheet('Reset PIN?',(note||'')+'This erases all expenses, EMIs and borrowings on this device and lets you create a new PIN. You can restore from a backup afterwards.','Erase and reset',()=>{DB=blank();lsDel(KEY_DATA);lsDel(KEY_AUTH);auth=null;lockMode='setup1';buf='';first='';err='';renderLock()});
+}
+function openForgotSheet(){
+  if(!auth||!auth.sq||auth.sq.length<2){eraseResetSheet('No security questions were set, so the only way to reset is to start fresh. ');return}
+  const f=(n,l,pw)=>'<label>'+l+'<input name="'+n+'"'+(pw?' type="password" inputmode="numeric" maxlength="4"':'')+' autocomplete="off"></label>';
+  openSheet('Reset PIN',
+    '<p class="muted">Answer your two security questions to choose a new PIN. Your data stays safe.</p>'+f('a1',esc(auth.sq[0].q))+f('a2',esc(auth.sq[1].q))+f('n1','New PIN (4 digits)',true)+f('n2','New PIN again',true)+
+    '<button type="button" class="link" data-act="eraseReset">I do not remember the answers</button>',
+    async fd=>{
+      if(Date.now()<lockUntil)return 'Too many wrong tries. Wait a minute and try again.';
+      const a1=norm(fd.get('a1')),a2=norm(fd.get('a2')),n1=String(fd.get('n1')||''),n2=String(fd.get('n2')||'');
+      if(!a1||!a2)return 'Answer both questions.';
+      if(!/^\d{4}$/.test(n1))return 'New PIN must be exactly 4 digits.';
+      if(n1!==n2)return 'The new PINs do not match.';
+      const ok=(await hashPin(a1,auth.salt+'q0'))===auth.sq[0].h&&(await hashPin(a2,auth.salt+'q1'))===auth.sq[1].h;
+      if(!ok){
+        fails++;
+        if(fails>=5){fails=0;lockUntil=Date.now()+60000;return 'Too many wrong tries. Wait a minute and try again.'}
+        const left=5-fails;
+        return 'Those answers do not match. '+left+(left===1?' try':' tries')+' left.';
+      }
+      fails=0;
+      const salt=uid();
+      auth={salt:salt,hash:await hashPin(n1,salt),sq:[{q:auth.sq[0].q,h:await hashPin(a1,salt+'q0')},{q:auth.sq[1].q,h:await hashPin(a2,salt+'q1')}]};
+      lsSet(KEY_AUTH,JSON.stringify(auth));
+      unlock();toast('New PIN set. Welcome back.');return true;
+    },'Set new PIN');
+}
+
+/* ---------- phone notifications (only inside the Android app) ---------- */
+const NATIVE=!!window.KKNative;
+const hashInt=s=>{let h=5381;for(let i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))|0;return Math.abs(h)%200000};
+let alertT=null,askedPerm=false;
+function scheduleAlertsSoon(){if(!NATIVE)return;clearTimeout(alertT);alertT=setTimeout(scheduleAlerts,600)}
+function scheduleAlerts(){
+  if(!NATIVE)return;
+  try{
+    if(!askedPerm){askedPerm=true;window.KKNative.requestPermission()}
+    const offs=Array.from(new Set([DB.settings.alertDays,1,0,-1,-2])),now=Date.now(),list=[];
+    DB.emis.forEach(e=>{
+      if(emiDone(e))return;
+      const base=hashInt(e.id)*10;
+      offs.forEach((off,idx)=>{
+        const p=shiftDays(e.due,-off).split('-').map(Number);
+        const at=new Date(p[0],p[1]-1,p[2],9,0,0).getTime();
+        if(at<=now)return;
+        const title=off>1?'EMI due in '+off+' days':off===1?'EMI due tomorrow':off===0?'EMI due today':'EMI overdue';
+        list.push({id:base+idx,title:title,body:e.name+': '+inr(e.amount)+' ('+fmtDate(e.due)+')',at:at});
+      });
+    });
+    window.KKNative.scheduleAlerts(JSON.stringify(list));
+  }catch(e){}
+}
+
+/* ---------- start ---------- */
+$('#tabs').innerHTML='<div class="wrap">'+[['dash','Home',I.dash],['list','Expenses',I.list],['add','Add',I.plus],['emi','EMIs',I.cal],['udhaar','Udhaar',I.people]].map(t=>t[0]==='add'
+  ?'<button class="tab add" data-act="tab" data-tab="add"><span class="plus">'+t[2]+'</span><span>'+t[1]+'</span></button>'
+  :'<button class="tab" data-act="tab" data-tab="'+t[0]+'">'+t[2]+'<span>'+t[1]+'</span></button>').join('')+'</div>';
+renderLock();
+})();
+</script>
+
+</html>
